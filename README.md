@@ -15,6 +15,8 @@ docker build -t topguntaube/threejs:latest
 ```` 
 
 2. Run the container: 
-```bash docker run -p 8080:80 topguntaube/threejs:latest```` 
+```bash
+docker run -p 8080:80 topguntaube/threejs:latest
+```` 
 
-3. Open your browser at http://localhost:8080 to see the Three.js scene.
+4. Open your browser at http://localhost:8080 to see the Three.js scene.
