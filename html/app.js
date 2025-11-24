@@ -1,4 +1,5 @@
-// App.js
+// app.js
+
 let scene, camera, renderer, globe;
 let container = document.body;
 let globeStyle = 0; // Toggle between different globe styles
@@ -18,7 +19,7 @@ function init() {
     container.appendChild(renderer.domElement);
 
     // Create the globe using three-globe
-    globe = new Globe()
+    globe = new ThreeGlobe()
         .globeImageUrl('//unpkg.com/three-globe/example/img/earth-day.jpg')  // Default globe style
         .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png'); // Topology map
 
