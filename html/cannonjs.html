@@ -11,9 +11,10 @@
 </head>
 <body>
   <script type="module">
+    // Corrected CDN imports for Three.js, OrbitControls, and Cannon.js (using unpkg CDN)
     import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js';
     import { OrbitControls } from 'https://unpkg.com/three@0.158.0/examples/js/controls/OrbitControls.js';
-    import * as CANNON from 'https://cdn.skypack.dev/cannon-es@0.22.1';
+    import * as CANNON from 'https://unpkg.com/cannon-es@0.22.0/dist/cannon-es.js';
 
     let scene, camera, renderer, controls;
     let world, cube, sphere, light, ground;
