@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Three.js + Cannon.js Physics</title>
+  <title>Advanced Three.js + Cannon.js Physics</title>
   <style>
     body { margin: 0; overflow: hidden; }
     canvas { display: block; }
@@ -11,23 +11,25 @@
 </head>
 <body>
   <script type="module">
-    import * as THREE from './libs/three.module.js';
-    import { OrbitControls } from './libs/OrbitControls.js';
-    import * as CANNON from './libs/cannon-es.js';
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js';
+    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/OrbitControls.js';
+    import * as CANNON from 'https://cdn.jsdelivr.net/npm/cannon-es@0.22.1/dist/cannon-es.js';
 
     let scene, camera, renderer, controls;
-    let world, cube, ground, sphere, light;
-    let cubeBody, sphereBody;
-
+    let world, cube, sphere, light, ground;
+    let cubeBody, sphereBody, sphereBodies = [];
+    let clock = new THREE.Clock();
+    
     // Initialize Three.js scene
     function setupScene() {
       scene = new THREE.Scene();
       camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.set(5, 5, 10);
+      camera.position.set(0, 5, 10);
 
       // Renderer
       renderer = new THREE.WebGLRenderer();
       renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true;
       document.body.appendChild(renderer.domElement);
 
       // OrbitControls
@@ -38,7 +40,8 @@
 
       // Lighting
       light = new THREE.PointLight(0xFFFFFF, 1, 100);
-      light.position.set(5, 5, 5);
+      light.position.set(5, 10, 5);
+      light.castShadow = true;
       scene.add(light);
     }
 
@@ -60,63 +63,50 @@
       });
       world.addBody(ground);
 
-      // Create the cube (dynamic body)
-      const cubeMaterial = new CANNON.Material();
-      const cubeShape = new CANNON.Box(new CANNON.Vec3(1, 1, 1)); // 1x1x1 box
-      cubeBody = new CANNON.Body({
-        mass: 1, // Dynamic body
-        position: new CANNON.Vec3(0, 5, 0), // Starting position
-        material: cubeMaterial
-      });
-      cubeBody.addShape(cubeShape);
-      world.addBody(cubeBody);
-
-      // Create the sphere (dynamic body)
-      const sphereMaterial = new CANNON.Material();
-      const sphereShape = new CANNON.Sphere(1); // Radius 1 sphere
-      sphereBody = new CANNON.Body({
-        mass: 1, // Dynamic body
-        position: new CANNON.Vec3(3, 10, 0),
-        material: sphereMaterial
-      });
-      sphereBody.addShape(sphereShape);
-      world.addBody(sphereBody);
+      // Add some random spheres with physics
+      for (let i = 0; i < 5; i++) {
+        const radius = Math.random() * 0.5 + 0.5; // Random radius between 0.5 and 1
+        const sphereMaterial = new CANNON.Material();
+        const sphereShape = new CANNON.Sphere(radius);
+        let sphereBody = new CANNON.Body({
+          mass: 1, // Dynamic body
+          position: new CANNON.Vec3(Math.random() * 10 - 5, Math.random() * 10 + 5, Math.random() * 10 - 5),
+          material: sphereMaterial
+        });
+        sphereBody.addShape(sphereShape);
+        world.addBody(sphereBody);
+        sphereBodies.push(sphereBody);
+      }
     }
 
-    // Create Three.js objects (cube, sphere, and ground)
+    // Create Three.js objects (ground, spheres)
     function createObjects() {
       // Ground
       const groundGeometry = new THREE.PlaneGeometry(100, 100);
       const groundMaterial = new THREE.ShadowMaterial({ opacity: 0.5 });
       const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
       groundMesh.rotation.x = -Math.PI / 2;
+      groundMesh.receiveShadow = true;
       scene.add(groundMesh);
-
-      // Cube
-      const cubeGeometry = new THREE.BoxGeometry(2, 2, 2);
-      const cubeMaterial = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
-      cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-      cube.castShadow = true;
-      scene.add(cube);
 
       // Sphere
       const sphereGeometry = new THREE.SphereGeometry(1);
       const sphereMaterial = new THREE.MeshLambertMaterial({ color: 0x0000ff });
-      sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-      sphere.castShadow = true;
-      scene.add(sphere);
-    }
+      
+      // Create multiple spheres
+      for (let i = 0; i < 5; i++) {
+        const sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        sphereMesh.position.set(Math.random() * 10 - 5, Math.random() * 10 + 5, Math.random() * 10 - 5);
+        sphereMesh.castShadow = true;
+        sphereMesh.receiveShadow = true;
+        scene.add(sphereMesh);
+      }
 
-    // Update the physics and Three.js objects
-    function updatePhysics() {
-      world.step(1 / 60); // Update physics world
-
-      // Sync the cube and sphere's position and rotation with their physics bodies
-      cube.position.copy(cubeBody.position);
-      cube.rotation.set(cubeBody.rotation.x, cubeBody.rotation.y, cubeBody.rotation.z);
-
-      sphere.position.copy(sphereBody.position);
-      sphere.rotation.set(sphereBody.rotation.x, sphereBody.rotation.y, sphereBody.rotation.z);
+      // Add shadow settings to light
+      light.shadow.mapSize.width = 1024;
+      light.shadow.mapSize.height = 1024;
+      light.shadow.camera.near = 0.5;
+      light.shadow.camera.far = 50;
     }
 
     // Handle window resize
@@ -124,6 +114,35 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
+    }
+
+    // Add force on mouse click
+    function applyForce(event) {
+      let mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+      let mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      let direction = new THREE.Vector3(mouseX * 10, mouseY * 10, 0);
+      let force = direction.normalize().multiplyScalar(30); // Apply force
+
+      // Apply force to random sphere
+      const randomIndex = Math.floor(Math.random() * sphereBodies.length);
+      sphereBodies[randomIndex].applyForce(new CANNON.Vec3(force.x, force.y, force.z), sphereBodies[randomIndex].position);
+    }
+
+    // Update the physics and Three.js objects
+    function updatePhysics() {
+      world.step(1 / 60); // Update physics world
+
+      // Sync the spheres' positions with their physics bodies
+      scene.traverse((obj) => {
+        if (obj instanceof THREE.Mesh) {
+          const body = sphereBodies.find((body) => body.position.x === obj.position.x);
+          if (body) {
+            obj.position.copy(body.position);
+            obj.rotation.set(body.rotation.x, body.rotation.y, body.rotation.z);
+          }
+        }
+      });
     }
 
     // Animation loop
@@ -142,6 +161,7 @@
       setupPhysics();
       createObjects();
       window.addEventListener('resize', onWindowResize, false);
+      window.addEventListener('click', applyForce, false); // Add click event for force
       animate();
     }
 
