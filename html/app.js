@@ -1,6 +1,6 @@
 // app.js
 
-let scene, camera, renderer, globe, controls;
+let scene, camera, renderer, globe;
 let container = document.body;
 let globeStyle = 0; // Toggle between different globe styles
 
@@ -11,7 +11,7 @@ function init() {
 
     // Set up the camera with a better position and angle
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 0, 1000);  // Increased distance for better visibility
+    camera.position.set(0, 0, 500);  // Adjusted camera position
     camera.lookAt(0, 0, 0);  // Camera looks at the globe's center
 
     // Set up the renderer
@@ -29,23 +29,16 @@ function init() {
 
     // Create the globe using three-globe
     globe = new ThreeGlobe()
-        .globeImageUrl('textures/Earth_Clouds.jpg')  // Earth texture (local)
-        .bumpImageUrl('textures/Earthmap1000x500.jpg')  // Topology texture (local)
-        .showGraticules(true)  // Optional: gridlines for better visual reference
-        .radius(500);  // Increase the size of the globe (500 units)
+        .globeImageUrl('textures/Earth1.jpg')  // Earth texture (local)
+        .bumpImageUrl('textures/Earth2.jpg')  // Topology texture (local)
+        .showGraticules(true);  // Optional: gridlines for better visual reference
 
     scene.add(globe);
-
-    // Set up mouse interaction (OrbitControls)
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableZoom = true;  // Enable zoom
-    controls.enablePan = true;   // Enable panning
-    controls.enableRotate = true;  // Enable rotation
 
     // Make the globe rotate automatically
     function animate() {
         requestAnimationFrame(animate);
-        controls.update();  // Update the controls for mouse interaction
+        globe.rotateY(0.001);  // Slowly rotate the globe
         renderer.render(scene, camera);
     }
 
@@ -71,7 +64,7 @@ function changeGlobeStyle() {
     } else if (globeStyle === 1) {
         globe.globeImageUrl('textures/Earth2.jpg');
     } else {
-        globe.globeImageUrl('textures/Earth1.jpg');
+        globe.globeImageUrl('textures/Earth2.jpg');
     }
 }
 
