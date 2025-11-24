@@ -2,7 +2,7 @@
 *.env
 
 # Ignore config.js file containing variables
-/html/config.js
+./html/config.js
 
 # Ignore .DS_Store files (macOS)
 .DS_Store
