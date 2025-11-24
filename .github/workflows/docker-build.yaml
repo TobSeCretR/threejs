@@ -1,10 +1,10 @@
-docker-build.ymlname: Build and Push Docker Image
+name: Build and Push Docker Image
 
 on:
   push:
     paths:
       - 'Dockerfile'
-      - '.github/workflows/docker-build.yml'
+      - '.github/workflows/docker-build.yaml'
     branches:
       - main
 
