@@ -29,8 +29,8 @@ function init() {
 
     // Create the globe using three-globe
     globe = new ThreeGlobe()
-        .globeImageUrl('https://upload.wikimedia.org/wikipedia/commons/8/8e/Earth_Clouds.jpg')  // Earth texture
-        .bumpImageUrl('https://upload.wikimedia.org/wikipedia/commons/1/17/Earthmap1000x500.jpg')  // Topology texture
+        .globeImageUrl('textures/Earth_Clouds.jpg')  // Earth texture (local)
+        .bumpImageUrl('textures/Earthmap1000x500.jpg')  // Topology texture (local)
         .showGraticules(true);  // Optional: gridlines for better visual reference
 
     scene.add(globe);
@@ -60,11 +60,11 @@ function changeGlobeStyle() {
     globeStyle = (globeStyle + 1) % 3;
 
     if (globeStyle === 0) {
-        globe.globeImageUrl('https://upload.wikimedia.org/wikipedia/commons/8/8e/Earth_Clouds.jpg');
+        globe.globeImageUrl('textures/Earth_Clouds.jpg');
     } else if (globeStyle === 1) {
-        globe.globeImageUrl('https://upload.wikimedia.org/wikipedia/commons/1/17/Earthmap1000x500.jpg');
+        globe.globeImageUrl('textures/Earthmap.jpg');
     } else {
-        globe.globeImageUrl('https://upload.wikimedia.org/wikipedia/commons/8/8e/Earth_Clouds.jpg');
+        globe.globeImageUrl('textures/Earth_Clouds.jpg');
     }
 }
 
