@@ -1,19 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Three.js Application</title>
-  <style>
-    body { margin: 0; overflow: hidden; }
-    canvas { display: block; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Globe with UI</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+        #menu {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 100;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        #menu button {
+            margin: 5px;
+            padding: 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-  <!-- Load Three.js from a CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
-  
-  <!-- Your app's script -->
-  <script src="app.js"></script>
+    <div id="menu">
+        <button onclick="changeGlobeStyle()">Change Globe Style</button>
+    </div>
+    <script src="https://cdn.skypack.dev/three"></script>
+    <script src="https://cdn.skypack.dev/three-globe"></script>
+    <script src="app.js"></script>
 </body>
 </html>

@@ -1,38 +1,61 @@
-// Scene setup
-let scene = new THREE.Scene();
+// App.js
+let scene, camera, renderer, globe;
+let container = document.body;
+let globeStyle = 0; // Toggle between different globe styles
 
-// Camera setup
-let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 5;
+// Initialize the scene, camera, renderer, and the globe
+function init() {
+    // Set up the scene
+    scene = new THREE.Scene();
 
-// Renderer setup
-let renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+    // Set up the camera
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 250;
 
-// Create a cube (geometry, material, mesh)
-let geometry = new THREE.BoxGeometry();
-let material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-let cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+    // Set up the renderer
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
 
-// Animation loop
-function animate() {
-  requestAnimationFrame(animate);
+    // Create the globe using three-globe
+    globe = new Globe()
+        .globeImageUrl('//unpkg.com/three-globe/example/img/earth-day.jpg')  // Default globe style
+        .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png'); // Topology map
 
-  // Rotate the cube for some movement
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
+    scene.add(globe);
 
-  renderer.render(scene, camera);
+    // Make the globe rotate automatically
+    function animate() {
+        requestAnimationFrame(animate);
+        globe.rotateY(0.001); // Slowly rotate the globe
+        renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // Handle window resizing
+    window.addEventListener('resize', onWindowResize, false);
 }
 
-// Handle window resizing
-window.addEventListener('resize', () => {
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-});
+// Handle resizing of the window
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
 
-// Start the animation loop
-animate();
+// Change the globe style when the button is clicked
+function changeGlobeStyle() {
+    globeStyle = (globeStyle + 1) % 3;
+
+    if (globeStyle === 0) {
+        globe.globeImageUrl('//unpkg.com/three-globe/example/img/earth-day.jpg');
+    } else if (globeStyle === 1) {
+        globe.globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg');
+    } else {
+        globe.globeImageUrl('//unpkg.com/three-globe/example/img/earth-satellite.jpg');
+    }
+}
+
+// Initialize the app when the window loads
+window.onload = init;
