@@ -11,24 +11,33 @@ function init() {
 
     // Set up the camera
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 250;
+    camera.position.set(0, 0, 400);  // Adjusted the camera position to be farther away from the globe
 
     // Set up the renderer
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     container.appendChild(renderer.domElement);
 
+    // Set up the light sources
+    const light = new THREE.AmbientLight(0x404040); // Ambient light
+    scene.add(light);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Directional light
+    directionalLight.position.set(0, 0, 1).normalize();
+    scene.add(directionalLight);
+
     // Create the globe using three-globe
     globe = new ThreeGlobe()
         .globeImageUrl('//unpkg.com/three-globe/example/img/earth-day.jpg')  // Default globe style
-        .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png'); // Topology map
+        .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')  // Topology map
+        .showGraticules(true);  // Optional: shows latitude/longitude gridlines for better visual cues
 
     scene.add(globe);
 
     // Make the globe rotate automatically
     function animate() {
         requestAnimationFrame(animate);
-        globe.rotateY(0.001); // Slowly rotate the globe
+        globe.rotateY(0.001);  // Slowly rotate the globe
         renderer.render(scene, camera);
     }
 
