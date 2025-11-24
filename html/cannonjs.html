@@ -1,203 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Three.js + Cannon Physics Demo</title>
-  <style>
-    html, body { height: 100%; margin: 0; }
-    canvas { display: block; }
-    #info {
-      position: absolute;
-      top: 10px; left: 10px;
-      color: #eee;
-      font-family: sans-serif;
-      background: rgba(0,0,0,0.35);
-      padding: 8px;
-      border-radius: 6px;
-      z-index: 10;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cannon.js Physics Demo</title>
+<style>
+  html,body { height:100%; margin:0; overflow:hidden; }
+  canvas { display:block; }
+  #info {
+    position: absolute; top: 10px; left: 10px;
+    background: rgba(0,0,0,0.35); padding: 8px; border-radius:6px;
+    color: #eee; font-family: sans-serif; z-index:10;
+  }
+</style>
 </head>
 <body>
-  <div id="info">
-    Left-drag: rotate • Middle-drag/scroll: zoom • Right-drag: pan<br>
-    Click: shoot a sphere • Space: spawn a box
-  </div>
+<div id="info">
+  Left-drag: rotate • Middle-drag/scroll: zoom • Right-drag: pan<br>
+  Click: shoot a sphere • Space: spawn a box
+</div>
 
-  <script type="module">
-    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js';
-    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/controls/OrbitControls.js';
-    import * as CANNON from 'https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.module.js';
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/controls/OrbitControls.js';
+import * as CANNON from 'https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.module.js';
 
-    // --- Scene / Renderer / Camera ---
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x22263a);
+// --- Scene / Renderer / Camera ---
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x22263a);
 
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 2000);
-    camera.position.set(10, 10, 15);
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 2000);
+camera.position.set(15,15,25);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMap.enabled = true;
-    document.body.appendChild(renderer.domElement);
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.shadowMap.enabled = true;
+document.body.appendChild(renderer.domElement);
 
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.set(0,3,0);
-    controls.update();
+const controls = new OrbitControls(camera,renderer.domElement);
+controls.target.set(0,3,0);
+controls.update();
 
-    // --- Cannon world ---
-    const world = new CANNON.World({
-      gravity: new CANNON.Vec3(0, -9.82, 0)
-    });
-    world.broadphase = new CANNON.NaiveBroadphase();
-    world.solver.iterations = 10;
+// --- Cannon world ---
+const world = new CANNON.World({ gravity: new CANNON.Vec3(0,-9.82,0) });
+world.broadphase = new CANNON.NaiveBroadphase();
+world.solver.iterations = 10;
 
-    const defaultMaterial = new CANNON.Material('default');
-    world.defaultContactMaterial = new CANNON.ContactMaterial(defaultMaterial, defaultMaterial, {
-      friction: 0.4, restitution: 0.2
-    });
+const defaultMaterial = new CANNON.Material('default');
+world.defaultContactMaterial = new CANNON.ContactMaterial(defaultMaterial, defaultMaterial,{
+  friction:0.4, restitution:0.2
+});
 
-    // --- Helpers to sync meshes with bodies ---
-    const objects = [];
-    function addMeshBody(mesh, body) {
-      scene.add(mesh);
-      world.addBody(body);
-      objects.push({ mesh, body });
+// --- Objects helper ---
+const objects = [];
+function addMeshBody(mesh,body){ scene.add(mesh); world.addBody(body); objects.push({mesh,body}); }
+
+// --- Lights ---
+const hemi = new THREE.HemisphereLight(0xffffff,0x444444,0.6);
+hemi.position.set(0,20,0);
+scene.add(hemi);
+
+const dir = new THREE.DirectionalLight(0xffffff,0.8);
+dir.position.set(10,15,10);
+dir.castShadow = true;
+dir.shadow.mapSize.set(2048,2048);
+scene.add(dir);
+
+// --- Ground ---
+const groundMat = new THREE.MeshStandardMaterial({color:0x6a6f7a});
+const groundGeo = new THREE.PlaneGeometry(40,40);
+const groundMesh = new THREE.Mesh(groundGeo, groundMat);
+groundMesh.rotation.x = -Math.PI/2;
+groundMesh.receiveShadow = true;
+scene.add(groundMesh);
+
+const groundBody = new CANNON.Body({ mass:0, shape:new CANNON.Plane(), material:defaultMaterial });
+groundBody.quaternion.setFromEuler(-Math.PI/2,0,0);
+world.addBody(groundBody);
+
+// --- Grid ---
+scene.add(new THREE.GridHelper(40,40,0x33383e,0x2b3036));
+
+// --- Spawn box ---
+function spawnBox(pos,size=1,mass=1){
+  const geo = new THREE.BoxGeometry(size,size,size);
+  const mat = new THREE.MeshStandardMaterial({color:Math.random()*0xffffff});
+  const mesh = new THREE.Mesh(geo,mat);
+  mesh.castShadow=true; mesh.receiveShadow=true;
+  mesh.position.copy(pos);
+
+  const shape = new CANNON.Box(new CANNON.Vec3(size/2,size/2,size/2));
+  const body = new CANNON.Body({mass,shape,material:defaultMaterial});
+  body.position.set(pos.x,pos.y,pos.z);
+
+  addMeshBody(mesh,body);
+}
+
+// --- Initial tower ---
+for(let y=0;y<5;y++){
+  for(let i=-2;i<=2;i++){
+    for(let j=-2;j<=2;j++){
+      spawnBox(new THREE.Vector3(i*1.05,0.5+y*1.05,j*1.05));
     }
+  }
+}
 
-    // --- Lights ---
-    const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
-    hemi.position.set(0,20,0);
-    scene.add(hemi);
+// --- Shoot spheres ---
+function shootSphere(clientX,clientY){
+  const rect = renderer.domElement.getBoundingClientRect();
+  const x = (clientX-rect.left)/rect.width*2-1;
+  const y = -(clientY-rect.top)/rect.height*2+1;
+  const mouse = new THREE.Vector2(x,y);
 
-    const dir = new THREE.DirectionalLight(0xffffff, 0.8);
-    dir.position.set(10,15,10);
-    dir.castShadow = true;
-    dir.shadow.mapSize.set(2048,2048);
-    scene.add(dir);
+  const ray = new THREE.Raycaster();
+  ray.setFromCamera(mouse,camera);
 
-    // --- Ground ---
-    const groundGeo = new THREE.PlaneGeometry(40,40);
-    const groundMat = new THREE.MeshStandardMaterial({ color: 0x6a6f7a });
-    const groundMesh = new THREE.Mesh(groundGeo, groundMat);
-    groundMesh.rotation.x = -Math.PI/2;
-    groundMesh.receiveShadow = true;
-    scene.add(groundMesh);
+  const origin = ray.ray.origin.clone();
+  const dir = ray.ray.direction.clone();
 
-    const groundBody = new CANNON.Body({
-      mass: 0,
-      shape: new CANNON.Plane(),
-      material: defaultMaterial
-    });
-    groundBody.quaternion.setFromEuler(-Math.PI/2,0,0);
-    world.addBody(groundBody);
+  const radius=0.35;
+  const geo = new THREE.SphereGeometry(radius,24,24);
+  const mat = new THREE.MeshStandardMaterial({color:0xffaa66});
+  const mesh = new THREE.Mesh(geo,mat);
+  mesh.castShadow=true; mesh.receiveShadow=true;
 
-    // --- Grid helper ---
-    const grid = new THREE.GridHelper(40,40,0x33383e,0x2b3036);
-    scene.add(grid);
+  const shape = new CANNON.Sphere(radius);
+  const body = new CANNON.Body({mass:3,shape,material:defaultMaterial});
+  body.position.set(origin.x,origin.y,origin.z);
 
-    // --- Functions to spawn boxes ---
-    const boxSize = 1;
-    function spawnBox(position, size=boxSize, mass=1) {
-      const geo = new THREE.BoxGeometry(size,size,size);
-      const mat = new THREE.MeshStandardMaterial({ color: Math.random()*0xffffff });
-      const mesh = new THREE.Mesh(geo, mat);
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      mesh.position.copy(position);
+  body.applyImpulse(new CANNON.Vec3(dir.x*30,dir.y*30,dir.z*30),body.position);
 
-      const shape = new CANNON.Box(new CANNON.Vec3(size/2,size/2,size/2));
-      const body = new CANNON.Body({ mass, shape, material: defaultMaterial });
-      body.position.set(position.x, position.y, position.z);
+  addMeshBody(mesh,body);
 
-      addMeshBody(mesh, body);
-      return { mesh, body };
-    }
+  setTimeout(()=>{ world.removeBody(body); scene.remove(mesh); },15000);
+}
 
-    // --- Initial tower ---
-    for (let y=0; y<5; y++) {
-      for (let i=-2; i<=2; i++) {
-        for (let j=-2; j<=2; j++) {
-          spawnBox(new THREE.Vector3(i*1.05, 0.5+y*1.05, j*1.05));
-        }
-      }
-    }
+window.addEventListener('pointerdown', e => { if(e.button===0) shootSphere(e.clientX,e.clientY); });
 
-    // --- Shoot spheres on click ---
-    function shootSphere(clientX, clientY) {
-      const rect = renderer.domElement.getBoundingClientRect();
-      const x = (clientX - rect.left)/rect.width * 2 - 1;
-      const y = -(clientY - rect.top)/rect.height * 2 + 1;
-      const mouse = new THREE.Vector2(x,y);
+// --- Spawn box in front of camera on Space ---
+window.addEventListener('keydown', e => {
+  if(e.code==='Space'){
+    const forward = new THREE.Vector3();
+    camera.getWorldDirection(forward);
+    const pos = camera.position.clone().add(forward.multiplyScalar(3));
+    spawnBox(pos,0.9,1);
+  }
+});
 
-      const ray = new THREE.Raycaster();
-      ray.setFromCamera(mouse, camera);
+// --- Animation ---
+const fixedStep = 1/60;
+function animate(time){
+  requestAnimationFrame(animate);
+  world.step(fixedStep);
 
-      const origin = ray.ray.origin.clone();
-      const dir = ray.ray.direction.clone();
+  for(const o of objects){
+    o.mesh.position.copy(o.body.position);
+    o.mesh.quaternion.copy(o.body.quaternion);
+  }
 
-      const radius = 0.35;
-      const geo = new THREE.SphereGeometry(radius, 24,24);
-      const mat = new THREE.MeshStandardMaterial({ color: 0xffaa66 });
-      const mesh = new THREE.Mesh(geo, mat);
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
+  renderer.render(scene,camera);
+}
+animate();
 
-      const shape = new CANNON.Sphere(radius);
-      const body = new CANNON.Body({ mass: 3, shape, material: defaultMaterial });
-      body.position.set(origin.x, origin.y, origin.z);
-
-      const force = 30;
-      const impulse = new CANNON.Vec3(dir.x*force, dir.y*force, dir.z*force);
-      body.applyImpulse(impulse, body.position);
-
-      addMeshBody(mesh, body);
-
-      setTimeout(() => {
-        world.removeBody(body);
-        scene.remove(mesh);
-      }, 15000);
-    }
-
-    window.addEventListener('pointerdown', e => { if(e.button===0) shootSphere(e.clientX,e.clientY); });
-
-    // --- Spawn box in front of camera on Space ---
-    window.addEventListener('keydown', e => {
-      if(e.code==='Space') {
-        const forward = new THREE.Vector3();
-        camera.getWorldDirection(forward);
-        const pos = camera.position.clone().add(forward.multiplyScalar(3));
-        spawnBox(pos, 0.9, 1);
-      }
-    });
-
-    // --- Animation loop ---
-    const fixedStep = 1/60;
-    let lastTime;
-    function animate(time) {
-      requestAnimationFrame(animate);
-      if(!lastTime) lastTime=time;
-      let dt = (time-lastTime)/1000;
-      lastTime=time;
-
-      world.step(fixedStep, dt);
-
-      for(const o of objects){
-        o.mesh.position.copy(o.body.position);
-        o.mesh.quaternion.copy(o.body.quaternion);
-      }
-
-      renderer.render(scene,camera);
-    }
-    animate();
-
-    window.addEventListener('resize', ()=>{
-      camera.aspect = window.innerWidth/window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth,window.innerHeight);
-    });
-
-  </script>
+window.addEventListener('resize',()=>{
+  camera.aspect=window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth,window.innerHeight);
+});
+</script>
 </body>
 </html>
