@@ -1,28 +1,18 @@
-# Ignore .env file containing variables
+# === Secrets & tokens ===
+config.js          # ← this is the important line (exact filename in root)
 *.env
-
-# Ignore config.js file containing variables
-./html/config.js
-
-# Ignore .DS_Store files (macOS)
-.DS_Store
-
-# Ignore node_modules directory (Node.js)
-node_modules/
-
-# Ignore log files
-*.log
-
-# Ignore environment variable files
 .env
 
-# Ignore build directories (example for a frontend project)
+# === macOS / Windows ===
+.DS_Store
+Thumbs.db
+
+# === Node / build (if you ever add a build step) ===
+node_modules/
 dist/
 build/
+*.log
 
-# Ignore IDE-specific files (VSCode, JetBrains, etc.)
+# === IDE ===
 .vscode/
 .idea/
-
-# Ignore OS-specific files
-Thumbs.db
