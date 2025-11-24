@@ -1,6 +1,3 @@
-// Importing necessary components from the Three.js library (if using a module system)
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js';
-
 // Scene setup
 let scene = new THREE.Scene();
 
