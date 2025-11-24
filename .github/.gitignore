@@ -1,18 +1,19 @@
-# === Secrets & tokens ===
-config.js          # ← this is the important line (exact filename in root)
+# === Secrets & tokens (this covers your config.js everywhere) ===
+config.js
+html/config.js
 *.env
 .env
 
-# === macOS / Windows ===
+# === OS junk ===
 .DS_Store
 Thumbs.db
 
-# === Node / build (if you ever add a build step) ===
+# === Node / build (in case you ever add Vite, etc.) ===
 node_modules/
 dist/
 build/
 *.log
 
-# === IDE ===
+# === Editor / IDE folders ===
 .vscode/
 .idea/
