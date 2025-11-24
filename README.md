@@ -11,7 +11,7 @@ This repository contains a **Three.js project** served via Docker. It includes a
 1. Build the image manually (optional if using GitHub Actions):
 
 ```bash
-docker build -t topguntaube/threejs:latest .
+docker build -t topguntaube/threejs:latest
 
 2. Run the container: 
 docker run -p 8080:80 topguntaube/threejs:latest
