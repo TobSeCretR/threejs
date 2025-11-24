@@ -1,6 +1,6 @@
 // app.js
 
-let scene, camera, renderer, globe;
+let scene, camera, renderer, globe, controls;
 let container = document.body;
 let globeStyle = 0; // Toggle between different globe styles
 
@@ -35,9 +35,18 @@ function init() {
 
     scene.add(globe);
 
+    // Scale the globe to make it bigger
+    globe.scale.set(2, 2, 2);  // Scale by a factor of 2 (you can adjust this value)
+
+    // Initialize OrbitControls (this will allow you to rotate the globe with the mouse)
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableZoom = true; // Optional: allow zooming with the mouse scroll wheel
+    controls.enablePan = false; // Optional: disable panning (optional based on your needs)
+
     // Make the globe rotate automatically
     function animate() {
         requestAnimationFrame(animate);
+        controls.update();  // Update the controls (required for smooth interaction)
         globe.rotateY(0.001);  // Slowly rotate the globe
         renderer.render(scene, camera);
     }
