@@ -9,28 +9,29 @@ function init() {
     // Set up the scene
     scene = new THREE.Scene();
 
-    // Set up the camera
+    // Set up the camera with a better position and angle
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 0, 400);  // Adjusted the camera position to be farther away from the globe
+    camera.position.set(0, 0, 500);  // Adjusted camera position
+    camera.lookAt(0, 0, 0);  // Camera looks at the globe's center
 
     // Set up the renderer
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     container.appendChild(renderer.domElement);
 
-    // Set up the light sources
-    const light = new THREE.AmbientLight(0x404040); // Ambient light
+    // Set up the lighting for better visibility of the globe
+    const light = new THREE.AmbientLight(0x404040, 1); // Ambient light
     scene.add(light);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Directional light
-    directionalLight.position.set(0, 0, 1).normalize();
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 2); // Stronger directional light
+    directionalLight.position.set(0, 0, 1).normalize(); // Direction from above
     scene.add(directionalLight);
 
     // Create the globe using three-globe
     globe = new ThreeGlobe()
-        .globeImageUrl('//unpkg.com/three-globe/example/img/earth-day.jpg')  // Default globe style
-        .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')  // Topology map
-        .showGraticules(true);  // Optional: shows latitude/longitude gridlines for better visual cues
+        .globeImageUrl('https://upload.wikimedia.org/wikipedia/commons/8/8e/Earth_Clouds.jpg')  // Earth texture
+        .bumpImageUrl('https://upload.wikimedia.org/wikipedia/commons/1/17/Earthmap1000x500.jpg')  // Topology texture
+        .showGraticules(true);  // Optional: gridlines for better visual reference
 
     scene.add(globe);
 
@@ -59,11 +60,11 @@ function changeGlobeStyle() {
     globeStyle = (globeStyle + 1) % 3;
 
     if (globeStyle === 0) {
-        globe.globeImageUrl('//unpkg.com/three-globe/example/img/earth-day.jpg');
+        globe.globeImageUrl('https://upload.wikimedia.org/wikipedia/commons/8/8e/Earth_Clouds.jpg');
     } else if (globeStyle === 1) {
-        globe.globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg');
+        globe.globeImageUrl('https://upload.wikimedia.org/wikipedia/commons/1/17/Earthmap1000x500.jpg');
     } else {
-        globe.globeImageUrl('//unpkg.com/three-globe/example/img/earth-satellite.jpg');
+        globe.globeImageUrl('https://upload.wikimedia.org/wikipedia/commons/8/8e/Earth_Clouds.jpg');
     }
 }
 
