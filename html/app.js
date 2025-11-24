@@ -1,13 +1,10 @@
 // Set your Cesium ion access token (free account gives you 1 million requests/month)
-Cesium.Ion.defaultAccessToken =
-import.meta.env?.CESIUM_ION_TOKEN ||      // Vite
-    process.env.CESIUM_ION_TOKEN ||           // Node / webpack
-    new URLSearchParams(window.location.search).get('token') ||  // fallback URL param
-    ''; // ← leave empty as last resort
+Cesium.Ion.defaultAccessToken = 
+    (typeof CESIUM_ION_TOKEN !== 'undefined') ? CESIUM_ION_TOKEN : '';
 
-// Optional: show a helpful message if token is missing
 if (!Cesium.Ion.defaultAccessToken) {
-    console.warn('⚠️ No Cesium Ion token found! Get one at https://cesium.com/ion/tokens');
+    console.error('No Cesium Ion token found! Create config.js with your token.');
+    document.getElementById('info').textContent = 'Missing Cesium token – check console';
 }
 
 // ← This is the public default token that works for everyone (you can also sign up for your own free token at cesium.com/ion)

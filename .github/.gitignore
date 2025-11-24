@@ -1,6 +1,10 @@
 # Ignore .env file containing variables
 *.env
 
+# Ignore config.js file containing variables
+config.js
+
+
 # Ignore .DS_Store files (macOS)
 .DS_Store
 
