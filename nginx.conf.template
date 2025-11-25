@@ -1,11 +1,10 @@
+# nginx.conf.template — use curly braces!
 server {
     listen 80;
     root /usr/share/nginx/html;
     index index.html;
-
     location / {
         try_files $uri $uri/ =404;
-
         sub_filter_once off;
         sub_filter 'replace_me' '${CESIUM_TOKEN}';
         sub_filter_types application/javascript;
