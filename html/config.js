@@ -1,2 +1,2 @@
 // html/config.js  ← COMMIT THIS FILE (it contains no real token!)
-const CESIUM_TOKEN = "replace_me";
+const CESIUM_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2OTBkNTg0Ny02ZTM2LTQ1YmMtYmRlNi1mNGEzY2ZlY2U0NTAiLCJpZCI6MzYzNDUwLCJpYXQiOjE3NjQwMTEzNjh9.79Q0u_4LR6hatOXC1jt5zwT2nQ6BLeECBKhdz3wMYE8";
