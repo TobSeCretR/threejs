@@ -1,6 +1,5 @@
 // Set your Cesium ion access token (free account gives you 1 million requests/month)
-Cesium.Ion.defaultAccessToken = 
-    (typeof CESIUM_ION_TOKEN !== 'undefined') ? CESIUM_ION_TOKEN : '';
+Cesium.Ion.defaultAccessToken = window.CESIUM_ION_TOKEN || "";
 
 if (!Cesium.Ion.defaultAccessToken) {
     console.error('No Cesium Ion token found! Create config.js with your token.');

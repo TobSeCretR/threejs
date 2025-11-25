@@ -1,0 +1,2 @@
+// html/config.js.template  ← commit this file (no secret!)
+const CESIUM_ION_TOKEN = "${CESIUM_ION_TOKEN}";
