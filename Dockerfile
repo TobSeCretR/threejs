@@ -3,10 +3,10 @@ FROM nginx:alpine
 # Copy the website
 COPY ./html/ /usr/share/nginx/html/
 
-# Custom nginx config with env substitution
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy the template config
+COPY nginx.conf.template /etc/nginx/conf.d/default.conf.template
+
+# This is the magic line — tells the official entrypoint to substitute env vars
+ENV NGINX_ENVSUBST_TEMPLATE_SUFFIX=".template"
 
 EXPOSE 80
-
-# This enables $CESIUM_ION_TOKEN substitution at container startup
-ENV CESIUM_TOKEN=replace_me
