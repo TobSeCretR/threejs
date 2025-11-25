@@ -33,6 +33,5 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/threejs:latest
           platforms: linux/amd64,linux/arm64/v8
-          args:
+          build-args: |
             CESIUM_TOKEN=${{ secrets.CESIUM_TOKEN }}
-# trigger
