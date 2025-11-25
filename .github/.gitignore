@@ -1,6 +1,6 @@
 # === Secrets & tokens (this covers your config.js everywhere) ===
-config.js
-html/config.js
+#config.js
+#html/config.js
 *.env
 .env
 
