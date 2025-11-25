@@ -70,8 +70,18 @@ countriesPromise.then(dataSource => {
     const entities = dataSource.entities.values;
     for (let entity of entities) {
         // entity.name contains the country name
-        entity.polygon.extrudedHeight = 1000;        // slight 3D effect
+
+        // This gives the 3D "raised" effect you want
+        entity.polygon.extrudedHeight = 1000;
+
+        // This makes the bottom of the polygon follow the terrain
         entity.polygon.perPositionHeight = true;
+
+        // ← DELETE OR COMMENT OUT any line that sets entity.polygon.height
+        // (you probably never set it explicitly, but Cesium sets a default of 0 internally)
+        // So we explicitly clear it to silence the warning:
+        entity.polygon.height = undefined;
+
         entity.polygon.material = Cesium.Color.fromRandom({
             alpha: 0.25,
             minimumRed: 0.3,
