@@ -11,12 +11,12 @@ This repository contains a **Three.js project** served via Docker. It includes a
 1. Build the image manually (optional if using GitHub Actions):
 
 ```bash
-docker build -t topguntaube/threejs:latest
+docker build -t herrtobiasherr/threejs:latest
 ```` 
 
 2. Run the container: 
 ```bash
-docker run -p 8080:80 topguntaube/threejs:latest
+docker run -p 8080:80 herrtobiasherr/threejs:latest
 ```` 
 
 4. Open your browser at http://localhost:8080 to see the Three.js scene.
